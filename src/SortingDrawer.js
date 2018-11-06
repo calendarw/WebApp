@@ -33,23 +33,16 @@ const styles = theme => ({
     color: '#FFFFFF',
   },
   button: {
-    //    border: '2px solid' ,
-    //    borderColor: green[200],
-    //    width: '100%',
-        fontWeight: 'bold',
-        fontSize: '0.8rem',
-        margin: theme.spacing.unit,
-    //    color: '#FFFFFF',
-        textAlign: 'left',
-        padding: 0,
-        border: 0,
-        borderBottom: '1px solid',
-        borderRadius: 0,
-        minHeight: 'auto'
-    //    backgroundColor: green[500],
-    //    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-    //    display:'flex',
-      },
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    margin: theme.spacing.unit,
+    textAlign: 'left',
+    padding: 0,
+    border: 0,
+    borderBottom: '1px solid',
+    borderRadius: 0,
+    minHeight: 'auto'
+  },
   buttonContainer: {
   //  flex: '1 0 auto',
   },
@@ -59,9 +52,6 @@ const styles = theme => ({
     fontStyle: 'italic',
     fontSize: '1.0rem',
   },
-  container: {
-    width: '98vw'
-  },
   signButton: {
     fontWeight: 'bold',
     display: 'inline-block',
@@ -70,10 +60,10 @@ const styles = theme => ({
     color: 'white',
     backgroundColor: '#006eb9',
     padding: '5px',
-    border: '2px solid white',
-    borderRadius: '2px',
-    boxShadow: '0 0 0 3px #006eb9, 0 0 10px #aaa',
-  }, 
+    '&:hover': {
+      backgroundColor: '#006eb9',
+    }
+  },
 });
 
 
@@ -93,13 +83,13 @@ class SortingDrawer extends React.Component {
   };
 
   setSorting(sorting){
-  	 if(sorting === 'sortByLastUpdate'){
+  	 if(sorting === constant.sortByLastUpdateLabel){
       this.setState({
         selectedSorting: sorting,
         isSortByLastUpdate: true,
         isSortByDistance: false
       });
-    } else if(sorting === 'sortByDistance'){
+    } else if(sorting === constant.sortByDistanceLabel){
       this.setState({
         selectedSorting: sorting,
         isSortByDistance: true,
@@ -108,18 +98,18 @@ class SortingDrawer extends React.Component {
     }
 
     this.toggleDrawer(false);
-    const { selectedSorting } = this.props;
-    selectedSorting(sorting);
+    const { selectedSorting, filterID } = this.props;
+    selectedSorting(sorting, filterID);
   }
 
   renderSortByLastUpdate() {
-    return (<ListItem button onClick={() => {this.setSorting('sortByLastUpdate')}}>
+    return (<ListItem button onClick={() => {this.setSorting(constant.sortByLastUpdateLabel)}}>
                <ListItemText primary={constant.sortByLastUpdateLabel} />
             </ListItem>);
   }
 
   renderSortByDistance(){
-  	return (<ListItem button onClick={() => {this.setSorting('sortByDistance')}}>
+  	return (<ListItem button onClick={() => {this.setSorting(constant.sortByDistanceLabel)}}>
                <ListItemText primary={constant.sortByDistanceLabel} />
             </ListItem>);
   }
@@ -144,7 +134,7 @@ class SortingDrawer extends React.Component {
       let sortBtnLabel = this.renderSortBtnLabel();
       const { classes } = this.props;
       return (
-      <div className={classes.container}>
+      <div>
           <Button
             variant="outlined" color="primary"
             onClick={() => {this.toggleDrawer(true)}}
@@ -185,8 +175,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
   	selectedSorting:
-      sorting =>
-        dispatch(selectedSorting(sorting)),
+      (sorting, filterID) =>
+        dispatch(selectedSorting(sorting, filterID)),
   }
 };
 

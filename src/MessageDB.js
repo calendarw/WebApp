@@ -1,6 +1,6 @@
 import * as firebase from 'firebase';
 import config, {constant} from './config/default';
-import distance from './Distance';
+import distance from './util/Distance';
 import {updateTagStat} from './GlobalDB';
 
 function tagsToTagfilter(tags) {
@@ -721,9 +721,6 @@ function fetchMessagesBasedOnInterestedTags(interestedTags, geolocation, dis, la
 }
 
 function updateMessageThumbnail(messageUUID, imageURL, publicImageURL, thumbnailImageURL, thumbnailPublicImageURL){
-    const db = firebase.firestore();
-
-    var collectionRef = db.collection(config.messageDB);
     return getMessage(messageUUID).then((messageRecord) => {
         messageRecord.imageUrl = imageURL;
         messageRecord.publicImageURL = publicImageURL;
@@ -734,8 +731,6 @@ function updateMessageThumbnail(messageUUID, imageURL, publicImageURL, thumbnail
 }
 
 function updatePollingResult(messageUUID, result) {
-  const db = firebase.firestore();
-  var collectionRef = db.collection(config.messageDB);
   return getMessage(messageUUID).then((messageRecord) => {
     let resultArray = [];
     if(messageRecord.polling.results.length > 0) {

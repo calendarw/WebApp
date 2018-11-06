@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'; 
+import { combineReducers } from 'redux';
 import { constant } from './config/default';
 import {
   FETCH_USER,
@@ -10,12 +10,11 @@ import {
   UPDATE_FILTER_DEFAULT,
   UPDATE_FILTER_TAG_LIST,
   RESET_FILTER_TAGS,
-  UPDATE_FILTER_TAG,  
+  UPDATE_FILTER_TAG,
   UPDATE_RECENT_MESSAGE,
   UPDATE_RECENT_BOOKMARK,
   FETCH_ADDRESS_BOOK,
   FETCH_PUBLIC_ADDRESS_BOOK,
-  FETCH_FOCUS_MESSAGE,
   FETCH_GLOBAL_BOOKMARKLIST,
   FETCH_GLOBAL_FOCUS_MESSAGE,
   TOGGLE_ADDRESS_DIALOG,
@@ -23,7 +22,7 @@ import {
   TOGGLE_REGIONEVENT_DIALOG,
   TOGGLE_EVENTLIST_DIALOG,
   UPDATE_PUBLIC_PROFILE_DIALOG,
-  TOGGLE_PUBLIC_PROFILE_DIALOG,  
+  TOGGLE_PUBLIC_PROFILE_DIALOG,
   TOGGLE_LEADER_BOARD,
   FETCH_TOP_TWENTY,
   UPDATE_FILTER_SORTING,
@@ -75,20 +74,25 @@ function addressBookReducer(state={addresses:[], publicAddresses:[]}, action) {
   }
 }
 
-function filterReducer(state={defaultEventNumber: constant.defaultEventNumber, eventNumber: constant.defaultEventNumber, geolocation: null, distance: 1, defaultDistance: 1, selectedTag: null, tagList: []}, action) {
+function filterReducer(state={defaultEventNumber: constant.defaultEventNumber, eventNumber: constant.defaultEventNumber, geolocation: null, distance: 1, defaultDistance: 1, selectedTag: {}, tagList: {}}, action) {
   let distance = action.distance;
+  let selectedTag = state.selectedTag;
+  let selectedSorting = state.selectedSorting;
+  let tagList = state.tagList;
   switch (action.type) {
     case UPDATE_FILTER_DEFAULT:
+      selectedTag = {};
+      tagList = {}; 
       return {
-        selectedTag: null, 
-        selectedSorting: 'sortByLastUpdate',
-        tagList: [],
+        selectedTag: selectedTag,
+        selectedSorting: {},
+        tagList: tagList,
         defaultEventNumber: action.eventNumber,
         eventNumber: action.eventNumber,
         geolocation: action.geolocation,
         distance: action.distance,
         defaultDistance: action.distance,
-      };    
+      };
     case UPDATE_FILTER:
       if(state.defaultDistance > distance) {
         distance = state.defaultDistance;
@@ -97,10 +101,12 @@ function filterReducer(state={defaultEventNumber: constant.defaultEventNumber, e
       if(state.defaultEventNumber > eventNumber) {
         eventNumber = state.defaultEventNumber;
       }
+      selectedTag[action.filterID] = null;
+      tagList[action.filterID] = []; 
       return {
         ...state,
-        selectedTag: null, 
-        tagList: [],
+        selectedTag: selectedTag,
+        tagList: tagList,
         eventNumber: eventNumber,
         geolocation: action.geolocation,
         distance: distance
@@ -108,46 +114,56 @@ function filterReducer(state={defaultEventNumber: constant.defaultEventNumber, e
     case UPDATE_FILTER_LOCATION:
       if(state.defaultDistance > distance || distance === undefined) {
         distance = state.defaultDistance;
-      }    
+      }
+      selectedTag[action.filterID] = null;
+      tagList[action.filterID] = []; 
       return {
         ...state,
-        selectedTag: null, 
-        tagList: [],
+        selectedTag: selectedTag,
+        tagList: tagList,
         geolocation: action.geolocation,
         distance: distance
       }
     case UPDATE_FILTER_TAG_LIST:
-      var tagList = state.tagList;
-      var newTagList = action.tagList;
+      //let filteredTagList = state.tagList[action.filterID];
+      let newTagList = action.tagList;
+      if(tagList[action.filterID] === undefined) {
+        tagList[action.filterID] = [];
+      }
       if(newTagList  != null ) {
         newTagList.map((tag) => {
-          if(!tagList.includes(tag)) {
-            tagList.push(tag);
+          if(!tagList[action.filterID].includes(tag)) {
+            tagList[action.filterID].push(tag);
           }
           return;
         });
       }
-      //console.log("update Tag List" + tagList.join());
+      selectedTag[action.filterID] = null;
+      //tagList[action.filterID] = filteredTagList; 
       return {
         ...state,
-        selectedTag: null, 
+        selectedTag: selectedTag,
         tagList: tagList,
-      };   
+      };
     case RESET_FILTER_TAGS:
+      selectedTag[action.filterID] = null;
+      tagList[action.filterID] = []; 
       return {
         ...state,
-        selectedTag: null, 
-        tagList: []
-      };   
-    case UPDATE_FILTER_TAG:    
+        selectedTag: selectedTag,
+        tagList: tagList
+      };
+    case UPDATE_FILTER_TAG:
+      selectedTag[action.filterID] = action.selectedTag;
       return {
         ...state,
-        selectedTag: action.selectedTag
-      };  
+        selectedTag: selectedTag
+      };
     case UPDATE_FILTER_SORTING:
+      selectedSorting[action.filterID] = action.selectedSorting;
       return {
         ...state,
-        selectedSorting: action.selectedSorting
+        selectedSorting: selectedSorting
       };
     default:
       return state;
@@ -173,7 +189,7 @@ const buttonList = [
   { label: '社區幹事', value: '社區幹事' },
   { label: '環保', value: '環保' },
 
-  
+
 ].map(button => ({
   value: button.value,
   label: button.label,
@@ -195,7 +211,7 @@ function regionEventDialogReducer(state={open: false, buttons: buttonList}, acti
     case TOGGLE_REGIONEVENT_DIALOG:
       return {...state, open: action.open};
     case UPDATE_REGIONEVENT_BUTTONLIST:
-      return {...state, buttons: action.buttonList};      
+      return {...state, buttons: action.buttonList};
     default:
       return state;
   }
@@ -206,7 +222,7 @@ function searchEventDialogReducer(state={open: false, geolocation: constant.inva
     case TOGGLE_SEARCHEVENT_DIALOG:
       return {...state, open: action.open};
     case UPDATE_SEARCHEVENT_LOCATION:
-      return {...state, geolocation: action.geolocation};      
+      return {...state, geolocation: action.geolocation};
     default:
       return state;
   }
@@ -293,7 +309,7 @@ function ourlandReducer(state={focusMessages: [], globalFocusMessage: [], tagSta
     { label: '社區匯報' },
     { label: '社區幹事' },
 
-    
+
   ].map(suggestion => ({
     value: suggestion.label,
     label: suggestion.label,
@@ -324,9 +340,9 @@ function snackbarReducer(state={open: false, message: '', variant: 'success', },
     default:
       return state;
   }
-} 
+}
 
-const rootReducer = combineReducers({  
+const rootReducer = combineReducers({
   geoLocation: geoLocationReducer,
   user: userReducer,
   filter: filterReducer,

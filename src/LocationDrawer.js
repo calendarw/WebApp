@@ -64,11 +64,10 @@ signButton: {
   color: 'white',
   backgroundColor: '#006eb9',
   padding: '5px',
-  border: '2px solid white',
-  borderRadius: '2px',
-  boxShadow: '0 0 0 3px #006eb9, 0 0 10px #aaa',
-}, 
-
+  '&:hover': {
+    backgroundColor: '#006eb9',
+  }
+},
   buttonContainer: {
 //    flex: '1 0 auto',
   },
@@ -78,9 +77,6 @@ signButton: {
     fontStyle: 'italic',
     fontSize: '1.0rem',
   },
-  container: {
-    width: '98vw'
-  }
 });
 
 
@@ -142,7 +138,7 @@ class LocationDrawer extends React.Component {
       this.toggleDrawer(false);
       const { updateFilterLocation } = this.props;
 
-      updateFilterLocation(coords, distance);
+      updateFilterLocation(coords, distance, this.props.filterID);
   }
 
   setLocationPrefix(prefix) {
@@ -229,7 +225,7 @@ class LocationDrawer extends React.Component {
         //console.log(text);
         icons = <FolderIcon />
         return (
-          <ListItem button onClick={() => {this.setLocationPrefix(this.state.locationPrefix + text + '/')}}>
+          <ListItem key={text} button onClick={() => {this.setLocationPrefix(this.state.locationPrefix + text + '/')}}>
             <ListItemIcon>
             {icons}
             </ListItemIcon>
@@ -239,7 +235,7 @@ class LocationDrawer extends React.Component {
       } else if (locationString !== constant.addressNotSet ) {
        text = `${text} ${constant.nearby} ${distance}${constant.kilometre}`;
        return (
-         <ListItem button onClick={() => {this.setLocation(this.state.locationPrefix + text, distance, geolocation)}}>
+         <ListItem key={text} button onClick={() => {this.setLocation(this.state.locationPrefix + text, distance, geolocation)}}>
            <ListItemIcon>
            {icons}
            </ListItemIcon>
@@ -248,7 +244,7 @@ class LocationDrawer extends React.Component {
        );
      } else {
 //       console.log(text + " " +  address.geolocation + " " + locationString)
-       return (null);
+       return null;
      }
     });
   }
@@ -261,7 +257,7 @@ class LocationDrawer extends React.Component {
   currentLocationOnClick() {
     this.setState({...this.state, isUsingCurrentLocation: true});
     this.setState({distance: this.props.filter.defaultDistance});
-    this.props.updateFilterWithCurrentLocation();
+    this.props.updateFilterWithCurrentLocation(this.props.filterID);
     this.toggleDrawer(false);
   }
 
@@ -293,7 +289,7 @@ class LocationDrawer extends React.Component {
       let firstItem = this.renderFirstListItem();
       const { classes } = this.props;
       return (
-      <div className={classes.container}>
+      <div>
           <Button
             variant="outlined" color="primary"
             onClick={() => {this.toggleDrawer(true)}}
@@ -343,10 +339,10 @@ const mapDispatchToProps = (dispatch) => {
     fetchAddressBookFromOurLand:
       () => dispatch(fetchAddressBookFromOurLand()),
     updateFilterLocation:
-      (geolocation, distance) =>
-        dispatch(updateFilterLocation(geolocation, distance)),
+      (geolocation, distance, filterID) =>
+        dispatch(updateFilterLocation(geolocation, distance, filterID)),
     updateFilterWithCurrentLocation:
-      () => dispatch(updateFilterWithCurrentLocation()),
+      (filterID) => dispatch(updateFilterWithCurrentLocation(filterID)),
     toggleAddressDialog:
       (flag) => dispatch(toggleAddressDialog(flag)),
   }

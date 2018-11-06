@@ -138,7 +138,6 @@ class MessageDetailView extends Component {
 
   renderTitle() {
     const { user, message, classes} = this.props;
-    let timeOffset = Date.now() - message.createdAt.toDate();
     let urgentEventTag = null;
 
     if(user  != null  && user.userProfile  != null  && (user.userProfile.role === RoleEnum.admin || user.userProfile.role === RoleEnum.monitor)) {
@@ -379,7 +378,7 @@ class MessageDetailView extends Component {
       descHtml = ReactHtmlParser(text);
     }
 
-    if(m.polling) {
+    if(m.polling && m.polling.pollingTitle !== "") {
       pollingHtml = <PollingDialog polling={m.polling} messageUUID={m.key} geolocation={geolocation} status={m.status}/>
     }
 

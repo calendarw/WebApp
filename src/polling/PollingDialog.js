@@ -11,7 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import distance from '../Distance';
+import distance from '../util/Distance';
 import { constant, addressEnum } from '../config/default';
 import PollingView from './PollingView';
 import PollingResultView from './PollingResultView';
@@ -67,16 +67,16 @@ class PollingDialog extends React.Component {
             outOfRange = false;
           }
         }
+        return;
       });
       if(outOfRange) {
         this.setState({isOutOfPollingRange: true, disabledPolling: true})
       };
-      return;
     }
 
     if(polling.results !== undefined && polling.results.length > 0) {
       polling.results.find((result, index) => {
-        if(result.uid == user.user.uid) {
+        if(result.uid === user.user.uid) {
           this.setState({isAlreadyPolled: true, disabledPolling: true});
           return;
         }
@@ -109,7 +109,7 @@ class PollingDialog extends React.Component {
     const { status } = this.props;
     let pollingLabel = constant.pollingLabel;
 
-    if(status == constant.statusOptions[1]) {
+    if(status === constant.statusOptions[1]) {
       pollingLabel = constant.isAlreadyEndedLabel;
     } else if(this.state.isAlreadyPolled) {
       pollingLabel = constant.isAlreadyPolledLabel;
@@ -127,7 +127,6 @@ class PollingDialog extends React.Component {
   render() {
     const { classes, messageUUID } = this.props;
     const { polling } = this.state;
-    let buttonHtml = null;
     return (
       <span>
         <Paper role="button" onClick={(evt) => this.handleRequestOpen(evt)}>

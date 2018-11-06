@@ -5,7 +5,7 @@ import MessageDialog from './MessageDialog';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid'
-import distance from './Distance';
+import distance from './util/Distance';
 import timeOffsetStringInChinese from './TimeString.js';
 import { withStyles } from '@material-ui/core/styles';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
@@ -53,7 +53,7 @@ const styles = theme => ({
   },
   title: {
 //      textOverflow: 'ellipsis',
-    
+
   },
   pos: {
 //    marginBottom: 12,
@@ -96,7 +96,7 @@ const styles = theme => ({
   },
   titleBar: {
     background: 'linear-gradient(to bottom, #006fbf  50%, #014880 50%)',
-  },  
+  },
 });
 
 class MessageView extends Component {
@@ -110,8 +110,7 @@ class MessageView extends Component {
   }
 
   handleClick() {
-    const { updateRecentMessage } = this.props;
-    if(this.props.message.key  != null  && this.props.message.key !== "") {
+    if (this.props.message.key  != null  && this.props.message.key !== "") {
       this.openDialog();
     }
   };
@@ -130,11 +129,11 @@ class MessageView extends Component {
     return (<Card className={classes.tileCard} onClick={() => this.handleClick()}>
               <CardMedia className={classes.tileMedia} image={imageUrl} title={auther}/>
               <CardContent>
-                <Typography noWrap='true' className={classes.title} variant="title">{urgentEventTag} {text}</Typography>
+                <Typography noWrap={true} className={classes.title} variant="title">{urgentEventTag} {text}</Typography>
                 <p className={classes.pos}>{subtitle}</p>
               </CardContent>
             </Card>);
-            
+
   };
 
   sliceRender(user, text, auther, imageUrl, subtitle, isUpdate, isReportedUrgentEvent, isUrgentEvent) {
@@ -162,7 +161,7 @@ class MessageView extends Component {
 
     let summary = <Grid className={classes.summaryGrid} item xs onClick={() => this.handleClick()}>
                       <Typography className={classes.auther}>{newIcon}{auther}</Typography>
-                      <Typography noWrap='true' className={classes.title} variant="title">{urgentEventTag} {text}</Typography>
+                      <Typography noWrap={true} className={classes.title} variant="title">{urgentEventTag} {text}</Typography>
                       <p className={classes.pos}>{subtitle}</p>
                   </Grid>
     let thumbnail = <Grid item className={classes.thumbnailGrid}><CardMedia className={classes.cover}  image={imageUrl}/> </Grid>
