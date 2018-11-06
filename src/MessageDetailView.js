@@ -32,6 +32,7 @@ import {constant, RoleEnum} from './config/default';
 import {trackEvent} from './track';
 import PollingDialog from './polling/PollingDialog';
 import {getUserProfileImage} from './UserProfile';
+import AddToCalendar from 'react-add-to-calendar';
 
 const styles = theme => ({
   button: {
@@ -203,7 +204,7 @@ class MessageDetailView extends Component {
         </Grid>
         <Grid item xs direction='column' className={classes.summaryGrid} >
           <a href={geolink} target="_blank">
-            <Typography variant="subheading" >
+            <Typography variant="subheading">
             {locationString}
             </Typography>
           </a>
@@ -226,7 +227,6 @@ class MessageDetailView extends Component {
       let date = m.start.toDate();
       if(date.getFullYear() > 1970) {
         dateTimeString = date.toLocaleDateString('zh-Hans-HK', { timeZone: 'Asia/Hong_Kong' });
-        console.log(dateTimeString);
         if(m.startTime  != null ) {
           dateTimeString += ` ${m.startTime}`;
         }
@@ -236,7 +236,7 @@ class MessageDetailView extends Component {
     }
     if(m.endDate  !== null && m.endDate  !== undefined)
     {
-      let endDate
+      let endDate;
       try {
         endDate = m.endDate.toDate();
       }
@@ -250,7 +250,6 @@ class MessageDetailView extends Component {
       }
       if(endDate.getFullYear() > 1970) {
         endDateTimeString = endDate.toLocaleDateString('zh-Hans-HK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        console.log(endDateTimeString);
       } else {
         endDate = null;
       }
@@ -271,6 +270,33 @@ class MessageDetailView extends Component {
       }
       let timeTypeHtml = <Typography variant="subheading"> {constant.timeOptions[1]} </Typography> ;
       if(duration  != null ) {
+        // activity
+        let today = Date.now();
+        let startTime = m.start.toDate();
+        if (startTime > today)
+        {
+          let timeString = dateTimeString.substring(dateTimeString.indexOf(' ')+1, dateTimeString.length);
+          startTime.setHours(timeString.substring(0,2));
+          startTime.setMinutes(timeString.substring(3,5));
+
+          let timeSeparator = duration.indexOf(':');
+          if (timeSeparator > 0){
+            let endTime = startTime;
+            let hrs = duration.substring(0, timeSeparator);
+            let mins = duration.substring(timeSeparator+1, duration.length);
+            endTime.setHours(startTime.getHours()+hrs);
+            endTime.setMinutes(endTime.getMinutes()+mins);
+            let event = {
+              title: m.text,
+              description: m.desc === null ? "" : m.desc,
+              location: m.streetAddress,
+              startTime: startTime,
+              endTime: endTime
+            };
+            let buttonLabel = dateTimeString;
+            dateTimeString = <AddToCalendar event={event} buttonLabel={buttonLabel} />
+          }
+        }
         durationHtml = <Typography variant="subheading"> 為期: {duration} </Typography>
         timeTypeHtml = <Typography variant="subheading"> {constant.timeOptions[0]} </Typography> ;
       }
